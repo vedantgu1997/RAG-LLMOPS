@@ -1,0 +1,19 @@
+faiss_db:
+  collection_name: "document_portal"
+
+embedding_model:
+  provider: "OpenAI"
+  type: "OpenAIEmbeddings"
+  model_name: "text-embedding-3-small"
+
+retriever:
+  top_k: 10
+
+llm:
+  openai:
+    provider: "OpenAI"
+    type: "ChatOpenAI"
+    model_name: "gpt-4o"
+    temperature: 0.0
+    max_tokens: 2048
+    
