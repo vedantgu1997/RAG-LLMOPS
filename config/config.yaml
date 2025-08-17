@@ -10,7 +10,7 @@ retriever:
   top_k: 10
 
 llm:
-  openai:
+  OpenAI:
     provider: "OpenAI"
     type: "ChatOpenAI"
     model_name: "gpt-4o"

@@ -6,14 +6,15 @@ from utils.config_loader import load_config
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
-log = CustomLogger().get_logger(__name__)
+
 
 class ModelLoader:
     def __init__(self) -> None:
         load_dotenv()
+        self.log = CustomLogger().get_logger(__name__)
         self._validate_env()
         self.config = load_config("config/config.yaml")
-        log.info("Configuration loaded successfully.", config_keys = list(self.config.keys()))
+        self.log.info("Configuration loaded successfully.", config_keys = list(self.config.keys()))
 
     def _validate_env(self):
         """
@@ -24,20 +25,20 @@ class ModelLoader:
         self.api_keys = {var: os.getenv(var) for var in required_vars}
         missing_vars = [var for var, value in self.api_keys.items() if value is None]
         if missing_vars:
-            log.error("Missing environment variables: %s", missing_vars)
+            self.log.error("Missing environment variables: %s", missing_vars)
             raise DocumentPortalException("Missing environment variables", sys) #type: ignore
-        log.info("Environment variables validated successfully.", api_keys=list(self.api_keys.keys()))
+        self.log.info("Environment variables validated successfully.", api_keys=list(self.api_keys.keys()))
 
     def load_embeddings(self):
         """
         Load and return the embedding model.
         """
         try:
-            log.info("Loading OpenAI embeddings model.")
+            self.log.info("Loading OpenAI embeddings model.")
             model_name = self.config["embeddings_model"]["model_name"]
             return OpenAIEmbeddings(model=model_name)
         except Exception as e:
-            log.error("Error loading model embeddings", error=str(e))
+            self.log.error("Error loading model embeddings", error=str(e))
             raise DocumentPortalException("Error loading model embeddings", sys) #type: ignore
 
     def load_llm(self):
@@ -47,11 +48,11 @@ class ModelLoader:
 
         llm_block = self.config["llm"]
 
-        log.info("Loading LLM")
-        provider_key = os.getenv("LLM_PROVIDER", "openai")
+        self.log.info("Loading LLM")
+        provider_key = os.getenv("LLM_PROVIDER", "OpenAI")
 
         if provider_key not in llm_block:
-            log.error("LLM provider not found in configuration", provider_key=provider_key)
+            self.log.error("LLM provider not found in configuration", provider_key=provider_key)
             raise ValueError(f"LLM provider '{provider_key}' not found in configuration")
         
         llm_config = llm_block[provider_key]
@@ -59,6 +60,7 @@ class ModelLoader:
         model_name = llm_config.get("model_name")
         temperature = llm_config.get("temperature")
         max_tokens = llm_config.get("max_tokens")
+        provider = provider.lower()
 
         if provider == "groq":
             llm = ChatGroq(
@@ -78,7 +80,7 @@ class ModelLoader:
             return llm
         
         else:
-            log.error("Unsupported LLM provider", provider=provider)
+            self.log.error("Unsupported LLM provider", provider=provider)
             raise ValueError(f"Unsupported LLM provider: {provider}")
 
     
