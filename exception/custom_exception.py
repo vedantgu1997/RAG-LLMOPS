@@ -1,8 +1,6 @@
 import traceback
 import sys
-from logger.custom_logger import CustomLogger
 
-logger = CustomLogger().get_logger(__file__)
 
 class DocumentPortalException(Exception):
     """Base class for all exceptions in the Document Portal application."""
@@ -28,7 +26,7 @@ if __name__ == "__main__":
         a = 1/0
     except Exception as e:
         app_exc = DocumentPortalException(e, sys)
-        logger.error(app_exc)
+        # logger.error(app_exc)
         print(app_exc)
 
 
