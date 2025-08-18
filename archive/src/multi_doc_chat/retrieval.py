@@ -48,7 +48,6 @@ class ConversationalRAG:
 
             self.retriever = vectorstore.as_retriever(search_type='similarity',search_kwargs={"k": 5})
             self.log.info("Retriever loaded from FAISS index successfully.", index_path=index_path, session_id=self.session_id)
-            self._build_lcel_chain()
             return self.retriever
             
         except Exception as e:
@@ -96,8 +95,8 @@ class ConversationalRAG:
                 | StrOutputParser()
             )
 
-            retrieve_docs = self.retriever | self._format_docs
-            
+            retrieve_docs = question_rewriter | self.retriever | self._format_docs
+
             self.chain = (
                 {
                     "context": retrieve_docs,
@@ -108,6 +107,7 @@ class ConversationalRAG:
                 | self.llm
                 | StrOutputParser()
             )
+            self.log.info("LCEL chain built successfully.", session_id=self.session_id)
         except Exception as e:
             self.log.error("Error building LCEL chain", error=str(e))
             raise DocumentPortalException("Error building LCEL chain in ConversationalRAG", sys)  # type: ignore
