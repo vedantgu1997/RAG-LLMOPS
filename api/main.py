@@ -5,6 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
 from typing import Dict, Any
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 app = FastAPI(title='Document Portal API', version='0.1.0')
 
@@ -16,8 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="../static"), name="static")
-templates = Jinja2Templates(directory="../templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
@@ -62,3 +65,5 @@ async def chat_query(query: str = Form(...)) -> Any:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
+    
+# python -m uvicorn main:app --reload
