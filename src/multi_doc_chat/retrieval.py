@@ -1,6 +1,8 @@
 import sys
 import os
 from operator import itemgetter
+from typing import Optional, List
+from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
@@ -53,9 +55,16 @@ class ConversationalRAG:
             self.log.error("Error loading retriever from FAISS", error=str(e))
             raise DocumentPortalException("Error loading retriever from FAISS", sys)  # type: ignore
 
-    def invoke(self):
+    def invoke(self, user_input: str, chat_history: Optional[List[BaseMessage]]) -> str:
         try:
-            pass
+            chat_history = chat_history or []
+            payload = {"input": user_input, "chat_history": chat_history}
+            answer = self.chain.invoke(payload)
+            if not answer:
+                self.log.warning("No answer returned from ConversationalRAG", user_input=user_input, session_id=self.session_id)
+                return "No relevant information found."
+            self.log.info("ConversationalRAG invoked successfully.", user_input=user_input, session_id=self.session_id, answer_preview=answer[:100])
+            return answer
         except Exception as e:
             self.log.error("Error invoking ConversationalRAG", error=str(e))
             raise DocumentPortalException("Error invoking ConversationalRAG", sys)  # type: ignore
