@@ -4,14 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 from pathlib import Path
-from src.doc_ingestion.data_ingestion import DocHandler, DocumentComparator, ChatIngestor, FaissManager
+from src.doc_ingestion.data_ingestion import DocHandler, DocumentComparator, ChatIngestor
 from src.doc_analyzer.data_analysis import DocumentAnalyzer
 from src.doc_compare.data_comparator import DocumentComparatorLLM
 from src.doc_chat.retrieval import ConversationalRAG
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+FAISS_BASE = os.getenv("FAISS_BASE", "faiss_index")
+UPLOAD_BASE = os.getenv("UPLOAD_BASE", "data")
+FAISS_INDEX_NAME = os.getenv("FAISS_INDEX_NAME", "index")
 
 app = FastAPI(title='Document Portal API', version='0.1.0')
 
@@ -31,7 +34,7 @@ async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/health")
-def heath() -> Dict[str, str]:
+def health() -> Dict[str, str]:
     return {"status": "ok", "service": "document-portal"}
 
 class FastAPIFileAdapter:
