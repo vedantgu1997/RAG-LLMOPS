@@ -123,14 +123,14 @@ async def chat_query(
     try:
         if use_session_dirs and not session_id:
             raise HTTPException(status_code=400, detail="Session ID is required when using session directories.")
-        
-        #Prepare fiass index path
-        index_dir = os.path.join(FAISS_BASE, session_id) if use_session_dirs else FAISS_BASE
+
+        #Prepare faiss index path
+        index_dir = os.path.join(FAISS_BASE, session_id) if use_session_dirs else FAISS_BASE #type: ignore
         if not os.path.isdir(index_dir):
             raise HTTPException(status_code=404, detail=f"Index directory not found: {index_dir}")
         
         #Initialize LCEL-style RAG pipeline
-        rag = ConversationalRAG(session_id=session_id)
+        rag = ConversationalRAG(session_id=session_id) # type: ignore
         rag.load_retriever_from_faiss(index_dir)
 
         #optional for now we pass empty chat history
