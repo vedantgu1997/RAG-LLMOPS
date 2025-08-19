@@ -53,11 +53,12 @@ def _read_pdf_via_handler(handler: DocHandler, path: str) -> str:
     """
     Helper function to read PDF using the provided handler.
     """
-    try:
+    if hasattr(handler, "read_pdf"):
         return handler.read_pdf(path)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading PDF: {str(e)}")
-    
+    if hasattr(handler, "read_"):
+        return handler.read_(path) # type: ignore
+    raise RuntimeError("DocHandler has neither read_pdf nor read_ method.")
+
 @app.post("/analyze")
 async def analyze_documents(file: UploadFile = File(...)) -> Any:
     try:

@@ -134,8 +134,8 @@ class ChatIngestor:
         chunks = splitter.split_documents(docs)
         log.info("Documents split", chunks=len(chunks), chunk_size=chunk_size, overlap=chunk_overlap)
         return chunks
-    
-    def built_retriver( self,
+
+    def build_retriever( self,
         uploaded_files: Iterable,
         *,
         chunk_size: int = 1000,
@@ -213,6 +213,8 @@ class DocHandler:
         except Exception as e:
             log.error("Failed to read PDF", error=str(e), pdf_path=pdf_path, session_id=self.session_id)
             raise DocumentPortalException(f"Could not process PDF: {pdf_path}", e) from e
+        
+        
 class DocumentComparator:
     """
     Save, read & combine PDFs for comparison with session-based versioning.
