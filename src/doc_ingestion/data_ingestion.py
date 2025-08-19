@@ -2,7 +2,6 @@ from __future__ import annotations
 import os
 import sys
 import json
-import uuid
 import hashlib
 import shutil
 from pathlib import Path

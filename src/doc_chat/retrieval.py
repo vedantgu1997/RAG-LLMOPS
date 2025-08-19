@@ -4,7 +4,6 @@ from operator import itemgetter
 from typing import Optional, List
 from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
 from utils.model_loader import ModelLoader
 from exception.custom_exception import DocumentPortalException
