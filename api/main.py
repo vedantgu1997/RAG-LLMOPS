@@ -57,7 +57,7 @@ def _read_pdf_via_handler(handler: DocHandler, path: str) -> str:
         return handler.read_pdf(path)
     if hasattr(handler, "read_"):
         return handler.read_(path) # type: ignore
-    raise RuntimeError("DocHandler has neither read_pdf nor read_ method.")
+    raise HTTPException(status_code=500, detail="DocHandler has neither read_pdf nor read_ method.")
 
 @app.post("/analyze")
 async def analyze_documents(file: UploadFile = File(...)) -> Any:
