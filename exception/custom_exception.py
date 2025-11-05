@@ -41,7 +41,7 @@ class DocumentPortalException(Exception):
         super().__init__(self.__str__())
 
     def __str__(self) -> str:
-        base = f"Errror in [{self.file_name}] at line [{self.line_number}]\nMessage: {self.error_message}"
+        base = f"Error in [{self.file_name}] at line [{self.line_number}]\nMessage: {self.error_message}"
         if self.traceback_str:
             return f"{base}\nTraceback:\n{self.traceback_str}"
         return base

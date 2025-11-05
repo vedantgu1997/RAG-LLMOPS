@@ -3,7 +3,6 @@ import re
 import uuid
 from pathlib import Path
 from datetime import datetime
-from zoneinfo import ZoneInfo
 import uuid
 from typing import Iterable, List
 from logger import GLOBAL_LOGGER as log
@@ -15,8 +14,7 @@ SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt"}
 # Helpers (file I/O + loading)  #
 # ----------------------------- #
 def generate_session_id(prefix: str = "session") -> str:
-    ist = ZoneInfo("Asia/Kolkata")
-    return f"{prefix}_{datetime.now(ist).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+    return f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
 
 def save_uploaded_files(uploaded_files: Iterable, target_dir: Path) -> List[Path]:
     """Save uploaded files (Streamlit-like) and return local paths."""

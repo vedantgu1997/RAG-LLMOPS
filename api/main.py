@@ -10,6 +10,8 @@ from src.doc_ingestion.data_ingestion import DocHandler, DocumentComparator, Cha
 from src.doc_analyzer.data_analysis import DocumentAnalyzer
 from src.doc_compare.data_comparator import DocumentComparatorLLM
 from src.doc_chat.retrieval import ConversationalRAG
+from utils.document_ops import FastAPIFileAdapter, read_pdf_via_handler
+from logger import GLOBAL_LOGGER as log
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FAISS_BASE = os.getenv("FAISS_BASE", "faiss_index")
@@ -37,34 +39,13 @@ async def serve_ui(request: Request):
 def health() -> Dict[str, str]:
     return {"status": "ok", "service": "document-portal"}
 
-class FastAPIFileAdapter:
-    """
-    Adapt FastAPI UploadFile -> .name + .getbuffer() API
-    """
-    def __init__(self, uf: UploadFile) -> None:
-        self._uf = uf
-        self.name = uf.filename
-
-    def getbuffer(self) -> bytes:
-        self._uf.file.seek(0)
-        return self._uf.file.read()
-
-def _read_pdf_via_handler(handler: DocHandler, path: str) -> str:
-    """
-    Helper function to read PDF using the provided handler.
-    """
-    if hasattr(handler, "read_pdf"):
-        return handler.read_pdf(path)
-    if hasattr(handler, "read_"):
-        return handler.read_(path) # type: ignore
-    raise RuntimeError("DocHandler has neither read_pdf nor read_ method.")
 
 @app.post("/analyze")
 async def analyze_documents(file: UploadFile = File(...)) -> Any:
     try:
         dh = DocHandler()
         save_path = dh.save_pdf(FastAPIFileAdapter(file))
-        text = _read_pdf_via_handler(dh, save_path)
+        text = read_pdf_via_handler(dh, save_path)
         analyzer = DocumentAnalyzer()
         analysis_result = analyzer.analyze_document(text)
         return JSONResponse(content=analysis_result)
@@ -122,6 +103,7 @@ async def chat_query(
     k: int = Form(5)
     ) -> Any:
     try:
+        log.info(f"Received chat query: '{query}' | session: {session_id}")
         if use_session_dirs and not session_id:
             raise HTTPException(status_code=400, detail="Session ID is required when using session directories.")
 
@@ -148,4 +130,5 @@ async def chat_query(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
     
+# conda activate ragops
 # python -m uvicorn main:app --reload

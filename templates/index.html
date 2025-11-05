@@ -152,7 +152,7 @@
 
   <footer class="app-footer">
     <div>© Document Portal • Demo UI</div>
-    <div class="tiny">Frontend only – hook to your FastAPI later.</div>
+    <div class="tiny"></div>
   </footer>
 
   <script>
@@ -287,7 +287,7 @@
       ans.textContent = "Thinking…";
 
       const fd = new FormData();
-      fd.append("question", q);
+      fd.append("query", q);
       fd.append("use_session_dirs", useSess ? "true" : "false");
       fd.append("k", String(k));
       if (useSess && currentSession) fd.append("session_id", currentSession);
